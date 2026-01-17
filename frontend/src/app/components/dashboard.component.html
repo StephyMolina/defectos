@@ -1,0 +1,301 @@
+<div class="dashboard-wrapper">
+  <!-- Menú Lateral -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        {{ sidebarCollapsed ? '☰' : '×' }}
+      </button>
+      <h2 *ngIf="!sidebarCollapsed">⚙️ Configuración</h2>
+    </div>
+
+    <nav class="sidebar-nav" *ngIf="!sidebarCollapsed">
+      <button
+        class="nav-item"
+        [class.active]="activeMenu === 'dashboard'"
+        (click)="activeMenu = 'dashboard'">
+        📊 Dashboard
+      </button>
+      <button
+        class="nav-item"
+        [class.active]="activeMenu === 'sprints'"
+        (click)="activeMenu = 'sprints'">
+        📅 Gestión de Sprints
+      </button>
+      <button
+        class="nav-item"
+        [class.active]="activeMenu === 'gerencial'"
+        (click)="activeMenu = 'gerencial'">
+        📈 Información Gerencial
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <main class="main-content" [class.expanded]="sidebarCollapsed">
+    <!-- Dashboard View -->
+    <div class="dashboard-container" *ngIf="activeMenu === 'dashboard'">
+      <div class="dashboard-header">
+        <h1>📊 Dashboard de Métricas ARANDA</h1>
+        <p>Sistema de Gestión de Servicios - Análisis de Especialistas y Productos</p>
+      </div>
+
+      <div class="filters-section">
+        <div class="filter-group">
+          <label>Sprint:</label>
+          <select [(ngModel)]="selectedSprint" (change)="onSprintChange()" class="filter-select">
+            <option value="">Seleccionar sprint ({{ sprintsDisponibles.length }})</option>
+            <option *ngFor="let sprint of sprintsDisponibles" [value]="sprint.id">{{ sprint.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Fecha Inicio:</label>
+          <input type="date" [(ngModel)]="startDate" (change)="onDateChange()" [disabled]="selectedSprint !== ''" />
+        </div>
+        <div class="filter-group">
+          <label>Fecha Fin:</label>
+          <input type="date" [(ngModel)]="endDate" (change)="onDateChange()" [disabled]="selectedSprint !== ''" />
+        </div>
+
+        <div class="filter-group">
+          <label>Grupo de Especialista:</label>
+          <select [(ngModel)]="selectedGrupo" (change)="onGroupChange()" class="filter-select">
+            <option value="todos">Todos los grupos</option>
+            <option *ngFor="let grupo of gruposDisponibles" [value]="grupo">{{ grupo }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Categoría:</label>
+          <select [(ngModel)]="selectedCategoria" (change)="onCategoryChange()" class="filter-select" [disabled]="selectedGrupo === 'todos'">
+            <option value="todos">Todas las categorías</option>
+            <option *ngFor="let cat of categoriasDisponibles" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Servicio:</label>
+          <select [(ngModel)]="selectedServicio" (change)="onServiceChange()" class="filter-select" [disabled]="selectedCategoria === 'todos'">
+            <option value="todos">Todos los servicios</option>
+            <option *ngFor="let serv of serviciosDisponibles" [value]="serv">{{ serv }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Tipo de Caso:</label>
+          <select [(ngModel)]="selectedTipoCaso" (change)="onTipoCasoChange()" class="filter-select">
+            <option value="todos">Todos los tipos</option>
+            <option *ngFor="let tipo of tiposCasoDisponibles" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </div>
+
+        <button class="btn-refresh" (click)="loadMetrics()">🔄 Actualizar</button>
+        <button class="btn-clear" (click)="clearFilters()">✖ Limpiar Filtros</button>
+      </div>
+
+      <!-- Filtros rápidos por categoría -->
+      <div class="quick-filters">
+        <p class="quick-filters-label">Filtros rápidos:</p>
+        <button class="quick-filter-btn" (click)="applyQuickCategoryFilter('SoloSIR')" 
+                [class.active]="selectedCategoria === 'SoloSIR'">
+          🍽️ Sistema Integrado Restaurante
+        </button>
+        <button class="quick-filter-btn" (click)="applyQuickCategoryFilter('soloE-commerce')"
+                [class.active]="selectedCategoria === 'soloE-commerce'">
+          🛍️ E-commerce
+        </button>
+        <button class="quick-filter-btn" (click)="applyQuickCategoryFilter('SoloHardware')"
+                [class.active]="selectedCategoria === 'SoloHardware'">
+          🖥️ Hardware
+        </button>
+        <button class="quick-filter-btn" (click)="applyQuickCategoryFilter('SoloMaxPoint')"
+                [class.active]="selectedCategoria === 'SoloMaxPoint'">
+          🌐 Ecosistema
+        </button>
+        <button class="quick-filter-btn reset" (click)="resetCategoryFilters()">
+          ↺ Resetear
+        </button>
+      </div>
+
+      <!-- Indicador de filtros activos -->
+      <div class="active-filters" *ngIf="hasActiveFilters()">
+        <span class="filter-badge" *ngIf="selectedGrupo !== 'todos'">
+          Grupo: {{ selectedGrupo }}
+          <button class="remove-filter" (click)="removeFilter('grupo')">×</button>
+        </span>
+        <span class="filter-badge" *ngIf="selectedCategoria !== 'todos'">
+          Categoría: {{ selectedCategoria }}
+          <button class="remove-filter" (click)="removeFilter('categoria')">×</button>
+        </span>
+        <span class="filter-badge" *ngIf="selectedServicio !== 'todos'">
+          Servicio: {{ selectedServicio }}
+          <button class="remove-filter" (click)="removeFilter('servicio')">×</button>
+        </span>
+        <span class="filter-badge" *ngIf="selectedTipoCaso !== 'todos'">
+          Tipo: {{ selectedTipoCaso }}
+          <button class="remove-filter" (click)="removeFilter('tipoCaso')">×</button>
+        </span>
+      </div>
+
+      <div *ngIf="loading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Cargando métricas...</p>
+      </div>
+
+      <div *ngIf="error" class="error-message">
+        ⚠️ {{ error }}
+      </div>
+
+      <!-- Tarjetas de resumen -->
+      <div class="metrics-grid" *ngIf="!loading">
+        <div class="metric-card">
+          <div class="card-icon">👥</div>
+          <h3>Especialistas</h3>
+          <p class="metric-value">{{ specialistsCount }}</p>
+          <p class="metric-label">{{ selectedGrupo !== 'todos' ? 'del Grupo' : 'Total Activos' }}</p>
+        </div>
+
+        <div class="metric-card">
+          <div class="card-icon">🎫</div>
+          <h3>Servicios</h3>
+          <p class="metric-value">{{ servicesCount }}</p>
+          <p class="metric-label">Atendidos</p>
+        </div>
+
+        <div class="metric-card">
+          <div class="card-icon">📦</div>
+          <h3>Casos</h3>
+          <p class="metric-value">{{ productsCount }}</p>
+          <p class="metric-label">Total</p>
+        </div>
+
+        <div class="metric-card">
+          <div class="card-icon">✅</div>
+          <h3>Resueltos</h3>
+          <p class="metric-value">{{ resolvedCount }}</p>
+          <p class="metric-label">{{resolvedPercentage}}% Completado</p>
+        </div>
+      </div>
+
+      <!-- Tabs de navegación -->
+      <div class="tabs-container">
+        <button
+          class="tab"
+          [class.active]="activeTab === 'specialists'"
+          (click)="activeTab = 'specialists'; loadSpecialistMetrics()">
+          👥 Por Especialista ({{specialistMetrics.length}})
+        </button>
+        <button
+          class="tab"
+          [class.active]="activeTab === 'products'"
+          (click)="activeTab = 'products'; loadProductMetrics()">
+          📦 Por Producto
+        </button>
+        <button
+          class="tab"
+          [class.active]="activeTab === 'services'"
+          (click)="activeTab = 'services'; loadServiceMetrics()">
+          🎫 Servicios
+        </button>
+        <button
+          class="tab"
+          [class.active]="activeTab === 'tables'"
+          (click)="activeTab = 'tables'; loadTables()">
+          🗂️ Explorar Tablas
+        </button>
+      </div>
+
+      <!-- Tab content placeholder (simplified) -->
+      <div class="tab-content">
+        <div *ngIf="activeTab === 'specialists'" class="data-section">
+          <h2>Especialistas - Rendimiento</h2>
+          <p class="subtitle">Métricas por especialista</p>
+          <div *ngIf="specialistMetrics.length === 0" class="no-data">
+            No hay datos disponibles
+          </div>
+          <table *ngIf="specialistMetrics.length > 0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Especialista</th>
+                <th>Grupo</th>
+                <th>Total Casos</th>
+                <th>Cerrados</th>
+                <th>Eficiencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of specialistMetrics; let i = index">
+                <td>{{i + 1}}</td>
+                <td><strong>{{ item.nombre }}</strong></td>
+                <td><span class="badge">{{ item.grupo }}</span></td>
+                <td>{{ item.total_servicios }}</td>
+                <td>{{ item.resueltos }}</td>
+                <td>
+                  <span class="efficiency" [class.high]="item.eficiencia >= 95"
+                        [class.medium]="item.eficiencia >= 85 && item.eficiencia < 95"
+                        [class.low]="item.eficiencia < 85">
+                    {{ item.eficiencia }}%
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="activeTab === 'products'" class="data-section">
+          <h2>Métricas por Producto</h2>
+          <div *ngIf="productMetrics.length === 0" class="no-data">
+            No hay datos disponibles
+          </div>
+          <table *ngIf="productMetrics.length > 0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Total</th>
+                <th>Cerrados</th>
+                <th>Activos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of productMetrics; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td><strong>{{ item.producto }}</strong></td>
+                <td>{{ item.total_servicios }}</td>
+                <td>{{ item.cerrados }}</td>
+                <td>{{ item.activos }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="activeTab === 'services'" class="data-section">
+          <h2>Servicios</h2>
+          <p>Métricas de servicios</p>
+        </div>
+
+        <div *ngIf="activeTab === 'tables'" class="data-section">
+          <h2>Tablas Disponibles</h2>
+          <p>Total: {{ availableTables.length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sprint Management View -->
+    <div class="sprint-management-container" *ngIf="activeMenu === 'sprints'">
+      <div class="dashboard-header">
+        <h1>📅 Gestión de Sprints</h1>
+      </div>
+      <p>Gestión de sprints aquí</p>
+    </div>
+
+    <!-- Gerencial View -->
+    <div class="gerencial-container" *ngIf="activeMenu === 'gerencial'">
+      <div class="dashboard-header">
+        <h1>📈 Información Gerencial</h1>
+      </div>
+      <p>Información gerencial aquí</p>
+    </div>
+  </main>
+</div>

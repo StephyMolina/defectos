@@ -1,0 +1,61 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║           TABLERO DE MÉTRICAS ARANDA - INICIO RÁPIDO        ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 ARCHIVOS BAT (Doble clic para ejecutar):
+
+   test-conexion.bat    → Prueba la conexión a ARANDABI
+   explorar-db.bat      → Explora las tablas disponibles
+   start.bat            → Inicia Backend y Frontend
+
+📚 DOCUMENTACIÓN:
+
+   PASOS_SIGUIENTES.md  → ⭐ EMPIEZA AQUÍ - Guía paso a paso
+   README_ARANDA.md     → Guía principal del proyecto
+   INSTRUCCIONES_ARANDA.md → Instrucciones detalladas
+   RESUMEN_PROYECTO.md  → Resumen completo del proyecto
+
+🔧 CONFIGURACIÓN:
+
+   Backend:  backend/.env  (Credenciales ya configuradas)
+   Frontend: frontend/src/environments/environment.ts
+
+🌐 URLs:
+
+   Backend:  http://localhost:3000
+   Frontend: http://localhost:4200
+   API Docs: http://localhost:3000/api
+
+📊 CARACTERÍSTICAS:
+
+   ✅ Dashboard interactivo con métricas
+   ✅ Filtros por fecha
+   ✅ Visualización por especialista
+   ✅ Visualización por producto
+   ✅ Explorador de tablas integrado
+   ✅ Conexión a ARANDABI (srvv-db-aranda)
+
+🚀 INICIO RÁPIDO:
+
+   1. Doble clic en: test-conexion.bat
+   2. Doble clic en: explorar-db.bat
+   3. Doble clic en: start.bat
+   4. Abre: http://localhost:4200
+
+📝 PRÓXIMOS PASOS:
+
+   1. Identifica las tablas de ARANDABI
+   2. Actualiza queries en: backend/src/controllers/metricsController.js
+   3. Usa los ejemplos de: backend/QUERIES_EJEMPLOS.md
+
+💡 AYUDA:
+
+   - Lee: PASOS_SIGUIENTES.md
+   - Usa el tab "Explorar Tablas" en el dashboard
+   - Revisa: backend/QUERIES_EJEMPLOS.md
+
+╔══════════════════════════════════════════════════════════════╗
+║  ¿LISTO? Ejecuta test-conexion.bat para empezar             ║
+╚══════════════════════════════════════════════════════════════╝
