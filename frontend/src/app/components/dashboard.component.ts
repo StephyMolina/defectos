@@ -21,8 +21,8 @@ import { MetricsService } from '../services/metrics.service';
         <nav class="sidebar-nav" *ngIf="!sidebarCollapsed">
           <button
             class="nav-item"
-            [class.active]="activeMenu === 'dashboard'"
-            (click)="activeMenu = 'dashboard'">
+            [class.active]="activeMenu === 'sprints'"
+            (click)="activeMenu = 'sprints'">
             📅 Gestión de Sprints
           </button>
           <button
@@ -34,7 +34,7 @@ import { MetricsService } from '../services/metrics.service';
         </nav>
 
         <!-- Contenido del Menú Lateral -->
-        <div class="sidebar-content" *ngIf="!sidebarCollapsed && activeMenu === 'dashboard'">
+        <div class="sidebar-content" *ngIf="!sidebarCollapsed && activeMenu === 'sprints'">
           <h3>Gestión de Sprints</h3>
 
           <!-- Formulario Sprint -->
@@ -915,6 +915,16 @@ export class DashboardComponent implements OnInit {
   newSprintFechaFin = '';
   editingSprintId: any = null;
 
+  // Configuración - CX (Jerarquía Nivel 1) y Dropdowns
+  cxList: any[] = [];
+  selectedCXValue = 'todos';
+  hierarchyLevel2List: string[] = [];
+  selectedHierarchy2 = 'todos';
+  configDropdowns = {
+    categoria: 'todos',
+    servicio: 'todos'
+  };
+
   constructor(private metricsService: MetricsService) {}
 
   ngOnInit(): void {
@@ -1173,7 +1183,7 @@ export class DashboardComponent implements OnInit {
     this.newSprintNombre = sprint.nombre;
     this.newSprintFechaInicio = sprint.fechaInicio;
     this.newSprintFechaFin = sprint.fechaFin;
-    this.activeMenu = 'dashboard';
+    this.activeMenu = 'sprints';
   }
 
   cancelEditSprint(): void {
