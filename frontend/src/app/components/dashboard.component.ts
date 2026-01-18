@@ -21,8 +21,8 @@ import { MetricsService } from '../services/metrics.service';
         <nav class="sidebar-nav" *ngIf="!sidebarCollapsed">
           <button
             class="nav-item"
-            [class.active]="activeMenu === 'sprints'"
-            (click)="activeMenu = 'sprints'">
+            [class.active]="activeMenu === 'dashboard'"
+            (click)="activeMenu = 'dashboard'">
             📅 Gestión de Sprints
           </button>
           <button
@@ -34,7 +34,7 @@ import { MetricsService } from '../services/metrics.service';
         </nav>
 
         <!-- Contenido del Menú Lateral -->
-        <div class="sidebar-content" *ngIf="!sidebarCollapsed && activeMenu === 'sprints'">
+        <div class="sidebar-content" *ngIf="!sidebarCollapsed && activeMenu === 'dashboard'">
           <h3>Gestión de Sprints</h3>
 
           <!-- Formulario Sprint -->
@@ -338,7 +338,7 @@ import { MetricsService } from '../services/metrics.service';
 
     .sidebar-header {
       padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #E4002B 0%, #C1001F 100%);
       color: white;
       display: flex;
       align-items: center;
@@ -389,7 +389,7 @@ import { MetricsService } from '../services/metrics.service';
     }
 
     .nav-item.active {
-      background: #667eea;
+      background: #E4002B;
       color: white;
     }
 
@@ -406,7 +406,7 @@ import { MetricsService } from '../services/metrics.service';
     .sidebar-content h4 {
       margin: 15px 0 10px 0;
       font-size: 14px;
-      color: #667eea;
+      color: #E4002B;
     }
 
     .sprint-form-sidebar {
@@ -508,8 +508,8 @@ import { MetricsService } from '../services/metrics.service';
     }
 
     .sprint-actions button:hover {
-      background: #667eea;
-      border-color: #667eea;
+      background: #E4002B;
+      border-color: #E4002B;
     }
 
     /* Main Content */
@@ -533,7 +533,7 @@ import { MetricsService } from '../services/metrics.service';
       text-align: center;
       margin-bottom: 30px;
       padding: 30px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #E4002B 0%, #C1001F 100%);
       color: white;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -635,7 +635,7 @@ import { MetricsService } from '../services/metrics.service';
     }
 
     .filter-badge {
-      background: #667eea;
+      background: #E4002B;
       color: white;
       padding: 6px 12px;
       border-radius: 20px;
@@ -697,7 +697,7 @@ import { MetricsService } from '../services/metrics.service';
     .metric-value {
       font-size: 36px;
       font-weight: bold;
-      color: #667eea;
+      color: #E4002B;
       margin: 10px 0;
     }
 
@@ -727,13 +727,13 @@ import { MetricsService } from '../services/metrics.service';
     }
 
     .tab:hover {
-      color: #667eea;
+      color: #E4002B;
       background: #f5f5f5;
     }
 
     .tab.active {
-      color: #667eea;
-      border-bottom-color: #667eea;
+      color: #E4002B;
+      border-bottom-color: #E4002B;
       background: #f5f5ff;
     }
 
@@ -758,7 +758,7 @@ import { MetricsService } from '../services/metrics.service';
     }
 
     .subtitle strong {
-      color: #667eea;
+      color: #E4002B;
       margin-right: 10px;
     }
 
@@ -820,7 +820,7 @@ import { MetricsService } from '../services/metrics.service';
 
     .spinner {
       border: 4px solid #f3f3f3;
-      border-top: 4px solid #667eea;
+      border-top: 4px solid #E4002B;
       border-radius: 50%;
       width: 50px;
       height: 50px;
@@ -1173,7 +1173,7 @@ export class DashboardComponent implements OnInit {
     this.newSprintNombre = sprint.nombre;
     this.newSprintFechaInicio = sprint.fechaInicio;
     this.newSprintFechaFin = sprint.fechaFin;
-    this.activeMenu = 'sprints';
+    this.activeMenu = 'dashboard';
   }
 
   cancelEditSprint(): void {
@@ -1207,3 +1207,4 @@ export class DashboardComponent implements OnInit {
     }
   }
 }
+
