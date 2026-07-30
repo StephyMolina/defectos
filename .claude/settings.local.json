@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s /b)",
+      "Bash(npm install:*)",
+      "Bash(start http://localhost:4200)",
+      "Bash(node -e:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}

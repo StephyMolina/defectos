@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Métricas ARANDA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .dashboard-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .dashboard-header p {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 16px;
+        }
+
+        .filters-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-refresh {
+            padding: 8px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            align-self: flex-end;
+            transition: background 0.3s;
+        }
+
+        .btn-refresh:hover {
+            background: #218838;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .metric-card h3 {
+            margin: 0 0 10px 0;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: #f5f5f5;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f5f5ff;
+        }
+
+        .tab-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .data-section h2 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-section {
+                flex-direction: column;
+            }
+
+            .btn-refresh {
+                align-self: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>📊 Dashboard de Métricas ARANDA</h1>
+            <p>Sistema de Gestión de Servicios - Análisis de Especialistas y Productos</p>
+        </div>
+
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>Fecha Inicio:</label>
+                <input type="date" id="startDate" value="2024-01-01">
+            </div>
+            <div class="filter-group">
+                <label>Fecha Fin:</label>
+                <input type="date" id="endDate" value="2024-12-31">
+            </div>
+            <button class="btn-refresh" onclick="updateMetrics()">🔄 Actualizar</button>
+        </div>
+
+        <!-- Tarjetas de resumen -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="card-icon">👥</div>
+                <h3>Especialistas</h3>
+                <p class="metric-value" id="totalEspecialistas">24</p>
+                <p class="metric-label">Total Activos</p>
+            </div>
+
+            <div class="metric-card">
+                <div class="card-icon">📦</div>
+                <h3>Productos</h3>
+                <p class="metric-value" id="totalProductos">8</p>
+                <p class="metric-label">En Gestión</p>
+            </div>
+
+            <div class="metric-card">
+                <div class="card-icon">🎫</div>
+                <h3>Servicios</h3>
+                <p class="metric-value" id="totalServicios">1,247</p>
+                <p class="metric-label">Atendidos</p>
+            </div>
+
+            <div class="metric-card">
+                <div class="card-icon">✅</div>
+                <h3>Resueltos</h3>
+                <p class="metric-value" id="totalResueltos">1,089</p>
+                <p class="metric-label">87.3% Completado</p>
+            </div>
+        </div>
+
+        <!-- Tabs de navegación -->
+        <div class="tabs-container">
+            <button class="tab active" onclick="showTab('specialists')">👥 Por Especialista</button>
+            <button class="tab" onclick="showTab('products')">📦 Por Producto</button>
+            <button class="tab" onclick="showTab('services')">🎫 Servicios</button>
+            <button class="tab" onclick="showTab('charts')">📈 Gráficos</button>
+        </div>
+
+        <!-- Contenido de tabs -->
+        <div class="tab-content">
+            <!-- Tab: Especialistas -->
+            <div id="tab-specialists" class="data-section">
+                <h2>Top 10 Especialistas - Rendimiento</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Especialista</th>
+                            <th>Servicios Atendidos</th>
+                            <th>Resueltos</th>
+                            <th>Pendientes</th>
+                            <th>Eficiencia</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><strong>María González</strong></td>
+                            <td>156</td>
+                            <td>142</td>
+                            <td>14</td>
+                            <td>91.0%</td>
+                            <td><span class="badge badge-success">Excelente</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><strong>Carlos Rodríguez</strong></td>
+                            <td>148</td>
+                            <td>135</td>
+                            <td>13</td>
+                            <td>91.2%</td>
+                            <td><span class="badge badge-success">Excelente</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><strong>Ana Martínez</strong></td>
+                            <td>142</td>
+                            <td>128</td>
+                            <td>14</td>
+                            <td>90.1%</td>
+                            <td><span class="badge badge-success">Excelente</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><strong>Juan Pérez</strong></td>
+                            <td>138</td>
+                            <td>118</td>
+                            <td>20</td>
+                            <td>85.5%</td>
+                            <td><span class="badge badge-info">Bueno</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><strong>Laura Sánchez</strong></td>
+                            <td>134</td>
+                            <td>115</td>
+                            <td>19</td>
+                            <td>85.8%</td>
+                            <td><span class="badge badge-info">Bueno</span></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td><strong>Pedro López</strong></td>
+                            <td>127</td>
+                            <td>106</td>
+                            <td>21</td>
+                            <td>83.5%</td>
+                            <td><span class="badge badge-info">Bueno</span></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td><strong>Sofía Ramírez</strong></td>
+                            <td>119</td>
+                            <td>95</td>
+                            <td>24</td>
+                            <td>79.8%</td>
+                            <td><span class="badge badge-warning">Regular</span></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td><strong>Diego Torres</strong></td>
+                            <td>112</td>
+                            <td>89</td>
+                            <td>23</td>
+                            <td>79.5%</td>
+                            <td><span class="badge badge-warning">Regular</span></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td><strong>Carmen Flores</strong></td>
+                            <td>105</td>
+                            <td>82</td>
+                            <td>23</td>
+                            <td>78.1%</td>
+                            <td><span class="badge badge-warning">Regular</span></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td><strong>Roberto Díaz</strong></td>
+                            <td>98</td>
+                            <td>75</td>
+                            <td>23</td>
+                            <td>76.5%</td>
+                            <td><span class="badge badge-warning">Regular</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Productos -->
+            <div id="tab-products" class="data-section hidden">
+                <h2>Métricas por Producto/Servicio</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Total Servicios</th>
+                            <th>Activos</th>
+                            <th>Cerrados</th>
+                            <th>Prioridad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Sistema ERP</strong></td>
+                            <td>Software</td>
+                            <td>342</td>
+                            <td>45</td>
+                            <td>297</td>
+                            <td><span class="badge badge-danger">Alta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Correo Electrónico</strong></td>
+                            <td>Comunicaciones</td>
+                            <td>289</td>
+                            <td>32</td>
+                            <td>257</td>
+                            <td><span class="badge badge-warning">Media</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Red Corporativa</strong></td>
+                            <td>Infraestructura</td>
+                            <td>234</td>
+                            <td>28</td>
+                            <td>206</td>
+                            <td><span class="badge badge-danger">Alta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hardware PC</strong></td>
+                            <td>Equipos</td>
+                            <td>187</td>
+                            <td>23</td>
+                            <td>164</td>
+                            <td><span class="badge badge-warning">Media</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Aplicaciones Web</strong></td>
+                            <td>Software</td>
+                            <td>156</td>
+                            <td>19</td>
+                            <td>137</td>
+                            <td><span class="badge badge-warning">Media</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>VPN/Accesos</strong></td>
+                            <td>Seguridad</td>
+                            <td>98</td>
+                            <td>12</td>
+                            <td>86</td>
+                            <td><span class="badge badge-danger">Alta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Telefonía IP</strong></td>
+                            <td>Comunicaciones</td>
+                            <td>76</td>
+                            <td>8</td>
+                            <td>68</td>
+                            <td><span class="badge badge-success">Baja</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Impresoras</strong></td>
+                            <td>Equipos</td>
+                            <td>65</td>
+                            <td>7</td>
+                            <td>58</td>
+                            <td><span class="badge badge-success">Baja</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Servicios -->
+            <div id="tab-services" class="data-section hidden">
+                <h2>Servicios por Estado y Prioridad</h2>
+
+                <h3 style="margin-top: 30px;">Por Estado</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                            <th>Porcentaje</th>
+                            <th>Visualización</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cerrado</strong></td>
+                            <td>1,089</td>
+                            <td>87.3%</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 87.3%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>En Proceso</strong></td>
+                            <td>98</td>
+                            <td>7.9%</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 7.9%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Abierto</strong></td>
+                            <td>42</td>
+                            <td>3.4%</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 3.4%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pendiente Cliente</strong></td>
+                            <td>18</td>
+                            <td>1.4%</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 1.4%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 40px;">Por Prioridad</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prioridad</th>
+                            <th>Cantidad</th>
+                            <th>Tiempo Promedio</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-danger">Crítica</span></td>
+                            <td>45</td>
+                            <td>2.3 horas</td>
+                            <td><span class="badge badge-success">Dentro SLA</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-warning">Alta</span></td>
+                            <td>278</td>
+                            <td>8.5 horas</td>
+                            <td><span class="badge badge-success">Dentro SLA</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">Media</span></td>
+                            <td>654</td>
+                            <td>24.2 horas</td>
+                            <td><span class="badge badge-success">Dentro SLA</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">Baja</span></td>
+                            <td>270</td>
+                            <td>48.7 horas</td>
+                            <td><span class="badge badge-success">Dentro SLA</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Gráficos -->
+            <div id="tab-charts" class="data-section hidden">
+                <h2>Análisis Visual de Métricas</h2>
+
+                <div class="chart-container">
+                    <h3>Rendimiento por Especialista (Top 5)</h3>
+                    <div style="margin-top: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>María González</strong></span>
+                                <span>91.0% (142/156)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 91.0%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Carlos Rodríguez</strong></span>
+                                <span>91.2% (135/148)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 91.2%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Ana Martínez</strong></span>
+                                <span>90.1% (128/142)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 90.1%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Juan Pérez</strong></span>
+                                <span>85.5% (118/138)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85.5%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Laura Sánchez</strong></span>
+                                <span>85.8% (115/134)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85.8%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container" style="margin-top: 30px;">
+                    <h3>Distribución de Servicios por Producto</h3>
+                    <div style="margin-top: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Sistema ERP</strong></span>
+                                <span>342 servicios (27.4%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 27.4%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Correo Electrónico</strong></span>
+                                <span>289 servicios (23.2%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 23.2%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Red Corporativa</strong></span>
+                                <span>234 servicios (18.8%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 18.8%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Hardware PC</strong></span>
+                                <span>187 servicios (15.0%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 15.0%"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><strong>Otros</strong></span>
+                                <span>195 servicios (15.6%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 15.6%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Tablero ARANDA - Sistema de Métricas y Servicios</p>
+    </footer>
+
+    <script>
+        function showTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.data-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Remover clase active de todos los botones
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar el tab seleccionado
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+
+        function updateMetrics() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            alert('Filtros aplicados:\nFecha Inicio: ' + startDate + '\nFecha Fin: ' + endDate + '\n\nEn la versión real, esto consultará la base de datos ARANDABI.');
+
+            // Aquí se haría la llamada a la API
+            console.log('Actualizando métricas con:', { startDate, endDate });
+        }
+
+        // Establecer fecha actual por defecto
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            const firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+
+            document.getElementById('startDate').value = firstDay;
+            document.getElementById('endDate').value = today;
+        };
+    </script>
+</body>
+</html>
