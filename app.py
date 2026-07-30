@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urlparse
 
 from openpyxl import Workbook, load_workbook
 
-EXCEL_PATH = Path(__file__).parent / "BUGS Reportados SIR 2024.xlsx"
+EXCEL_PATH = Path(r"C:\laragon\MOLINA\BUGS Reportados SIR 2024.xlsx")
 HOST = "127.0.0.1"
 PORT = 8000
 
@@ -23,7 +23,7 @@ CANDIDATE_FILTERS = [
     "Status",
     "Tipo",
     "Responsable de Reporte",
-    "Prioridad",
+    "prioridad DB",
 ]
 
 CLOSED_STATUS_VALUES = {
@@ -830,7 +830,7 @@ HTML_PAGE = """<!doctype html>
           </button>
           <div id="pastelesSubmenu" class="submenu hidden">
             <button class="option-btn secondary submenu-item" id="navPastelesSprint" type="button">Pasteles Sprint</button>
-            <button class="option-btn secondary submenu-item" id="navPastelesPrority" type="button">Pasteles Prioridad</button>
+            <button class="option-btn secondary submenu-item" id="navPastelesPrority" type="button">Pasteles Prioridad DB</button>
           </div>
         </div>
 
@@ -919,7 +919,7 @@ HTML_PAGE = """<!doctype html>
           </section>
 
           <section class="pie-card">
-            <div><h3>Prioridad</h3><p>Distribución por Prioridad de la hoja actual.</p></div>
+            <div><h3>Prioridad DB</h3><p>Distribución por prioridad DB de la hoja actual.</p></div>
             <div class="pie-figure" id="pieSprint4"><div class="pie-center"><strong id="pieSprint4Value">0%</strong><span id="pieSprint4Label">Sin datos</span></div></div>
             <div class="pie-legend" id="pieSprint4Legend"></div>
           </section>
@@ -934,8 +934,8 @@ HTML_PAGE = """<!doctype html>
 
       <section class="panel section hidden-section" id="pasteleProitySection">
         <div class="section-head">
-          <h2 class="section-title">Análisis: Prioridad por Sprint</h2>
-          <p class="section-subtitle" id="prioBySprintHint">Marca uno o más sprints en el filtro para comparar su Prioridad.</p>
+          <h2 class="section-title">Análisis: Prioridad DB por Sprint</h2>
+          <p class="section-subtitle" id="prioBySprintHint">Marca uno o más sprints en el filtro para comparar su prioridad DB.</p>
           <div style="margin-top: 12px; display: flex; gap: 8px;">
             <button class="option-btn" id="savePrioDbPdfBtn" type="button" style="font-size: 12px; padding: 8px 12px;">Descargar PDF</button>
             <button class="option-btn secondary" id="savePrioDbExcelBtn" type="button" style="font-size: 12px; padding: 8px 12px;">Descargar Excel</button>
@@ -990,8 +990,8 @@ HTML_PAGE = """<!doctype html>
 
         <section class="pie-card">
           <div>
-            <h3>Prioridad</h3>
-            <p>Distribución por Prioridad de la hoja actual.</p>
+            <h3>Prioridad DB</h3>
+            <p>Distribución por prioridad DB de la hoja actual.</p>
           </div>
           <div class="pie-figure" id="piePriorityDb"><div class="pie-center"><strong id="piePriorityDbValue">0%</strong><span id="piePriorityDbLabel">Sin datos</span></div></div>
           <div class="pie-legend" id="piePriorityDbLegend"></div>
@@ -1193,17 +1193,17 @@ HTML_PAGE = """<!doctype html>
         : [];
 
       if (!priorityColumn) {
-        grid.innerHTML = '<div class="empty">La hoja actual no tiene el campo Prioridad.</div>';
-        if (hint) hint.textContent = 'Sin campo Prioridad en esta hoja.';
+        grid.innerHTML = '<div class="empty">La hoja actual no tiene el campo prioridad DB.</div>';
+        if (hint) hint.textContent = 'Sin campo prioridad DB en esta hoja.';
         return;
       }
       if (!selected.length) {
         grid.innerHTML = '';
-        if (hint) hint.textContent = 'Marca uno o más sprints en el filtro para comparar su Prioridad.';
+        if (hint) hint.textContent = 'Marca uno o más sprints en el filtro para comparar su prioridad DB.';
         return;
       }
 
-      if (hint) hint.textContent = 'Comparando Prioridad en ' + selected.length + ' sprint(s): ' + selected.join(', ');
+      if (hint) hint.textContent = 'Comparando prioridad DB en ' + selected.length + ' sprint(s): ' + selected.join(', ');
 
       grid.innerHTML = selected.map((sprint) => {
         const sprintRows = payload.rows.filter((row) => String(row[sprintColumn] ?? '').trim() === String(sprint).trim());
@@ -1235,7 +1235,7 @@ HTML_PAGE = """<!doctype html>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Sprint Reportes</th>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Tarjeta Devops</th>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Sprint Despliegue</th>
-                    <th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd; font-weight: 600;">Prioridad</th>
+                    <th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd; font-weight: 600;">Prioridad DB</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1274,13 +1274,13 @@ HTML_PAGE = """<!doctype html>
       const statusColumn = getColumnName(payload.columns, ['Status', 'Estado', 'estado', 'estado de reporte']);
       const countryColumn = getColumnName(payload.columns, ['PAIS', 'País', 'pais', 'country']);
       const sprintColumn = getColumnName(payload.columns, ['Sprint despliegue']);
-      const priorityColumn = getColumnName(payload.columns, ['Prioridad', 'Prioridad']);
+      const priorityColumn = getColumnName(payload.columns, ['prioridad DB', 'prioridad db']);
       const respColumn = getColumnName(payload.columns, ['Responsable de Reporte', 'Responsable reporte']);
 
       renderPieCard('pieSprint1', 'pieSprint1Value', 'pieSprint1Label', 'pieSprint1Legend', countPieData(payload.rows, statusColumn), 'Sin estado');
       renderPieCard('pieSprint2', 'pieSprint2Value', 'pieSprint2Label', 'pieSprint2Legend', countPieData(payload.rows, countryColumn), 'Sin país');
       renderPieCard('pieSprint3', 'pieSprint3Value', 'pieSprint3Label', 'pieSprint3Legend', countPieData(payload.rows, sprintColumn), 'Sin sprint despliegue');
-      renderPieCard('pieSprint4', 'pieSprint4Value', 'pieSprint4Label', 'pieSprint4Legend', countPieData(payload.rows, priorityColumn), 'Sin Prioridad');
+      renderPieCard('pieSprint4', 'pieSprint4Value', 'pieSprint4Label', 'pieSprint4Legend', countPieData(payload.rows, priorityColumn), 'Sin prioridad DB');
       renderPieCard('pieSprint5', 'pieSprint5Value', 'pieSprint5Label', 'pieSprint5Legend', countPieData(payload.rows, respColumn), 'Sin responsable');
     }
 
@@ -1288,7 +1288,7 @@ HTML_PAGE = """<!doctype html>
       const statusColumn = getColumnName(payload.columns, ['Status', 'Estado', 'estado', 'estado de reporte']);
       const countryColumn = getColumnName(payload.columns, ['PAIS', 'País', 'pais', 'country']);
       const sprintColumn = getColumnName(payload.columns, ['Sprint despliegue']);
-      const priorityColumn = getColumnName(payload.columns, ['Prioridad', 'Prioridad']);
+      const priorityColumn = getColumnName(payload.columns, ['prioridad DB', 'prioridad db']);
       const respColumn = getColumnName(payload.columns, ['Responsable de Reporte', 'Responsable reporte']);
 
       const sprintLabel = document.getElementById('insightSprintLabel');
@@ -1302,7 +1302,7 @@ HTML_PAGE = """<!doctype html>
       renderPieCard('pieStatus', 'pieStatusValue', 'pieStatusLabel', 'pieStatusLegend', countPieData(payload.rows, statusColumn), 'Sin estado');
       renderPieCard('pieCountry', 'pieCountryValue', 'pieCountryLabel', 'pieCountryLegend', countPieData(payload.rows, countryColumn), 'Sin país');
       renderPieCard('pieDeployment', 'pieDeploymentValue', 'pieDeploymentLabel', 'pieDeploymentLegend', countPieData(payload.rows, sprintColumn), 'Sin sprint despliegue');
-      renderPieCard('piePriorityDb', 'piePriorityDbValue', 'piePriorityDbLabel', 'piePriorityDbLegend', countPieData(payload.rows, priorityColumn), 'Sin Prioridad');
+      renderPieCard('piePriorityDb', 'piePriorityDbValue', 'piePriorityDbLabel', 'piePriorityDbLegend', countPieData(payload.rows, priorityColumn), 'Sin prioridad DB');
       renderPieCard('pieResponsible', 'pieResponsibleValue', 'pieResponsibleLabel', 'pieResponsibleLegend', countPieData(payload.rows, respColumn), 'Sin responsable');
       renderPrioBySprint(payload, sprintColumn, priorityColumn);
     }
@@ -1414,7 +1414,7 @@ HTML_PAGE = """<!doctype html>
         .slice(0, 18);
       const head = `<th style="width:50px;text-align:center;">Seq</th>` + visibleColumns.map((col) => `<th>${escapeHtml(col)}</th>`).join('');
 
-      const priorityColName = getColumnName(columns, ['Prioridad', 'Prioridad']);
+      const priorityColName = getColumnName(columns, ['prioridad db', 'prioridad DB']);
       const body = rows.map((row, index) => {
         const seqCell = `<td style="text-align:center;font-weight:600;color:var(--muted);">${index + 1}</td>`;
         const cells = visibleColumns.map((col) => {
@@ -1987,7 +1987,7 @@ def build_meta(sheet_name: str, rows: list[dict[str, object]], columns: list[str
     country_column = pick_column(columns, ["PAIS", "País", "pais", "country"])
     resp_column = pick_column(columns, ["Responsable de Reporte", "Responsable reporte"])
     sprint_column = pick_column(columns, ["Sprint despliegue"])
-    priority_db_column = pick_column(columns, ["Prioridad", "Prioridad"])
+    priority_db_column = pick_column(columns, ["prioridad DB", "prioridad db"])
 
     top_country, top_country_count = top_label(rows, country_column)
     top_resp, top_resp_count = top_label(rows, resp_column)
@@ -2032,7 +2032,7 @@ def build_meta(sheet_name: str, rows: list[dict[str, object]], columns: list[str
                 "hint": f"Campo: {sprint_column or 'N/A'}",
             },
             {
-                "label": "Prioridad lider",
+                "label": "Prioridad DB lider",
                 "value": top_priority,
                 "hint": f"{top_priority_count} registros",
             },
@@ -2063,7 +2063,7 @@ def build_context(query: dict[str, str]) -> dict[str, object]:
     country_column = pick_column(columns, ["PAIS", "País", "pais", "country"])
     status_column = pick_column(columns, ["Status", "estado", "estado de reporte"])
     sprint_column = pick_column(columns, ["Sprint despliegue"])
-    priority_db_column = pick_column(columns, ["Prioridad", "Prioridad"])
+    priority_db_column = pick_column(columns, ["prioridad DB", "prioridad db"])
     responsible_column = pick_column(columns, ["Responsable de Reporte", "Responsable reporte"])
 
     meta = build_meta(sheet_name, rows, columns)
@@ -2122,7 +2122,7 @@ def build_excel_export(context: dict[str, object]) -> bytes:
     for section_name, breakdown in [
         ("Defecto por pais", context["country_breakdown"]),
         ("Despliegue por sprint", context["sprint_deployment_breakdown"]),
-        ("Prioridad", context["priority_db_breakdown"]),
+        ("Prioridad DB", context["priority_db_breakdown"]),
         ("Responsable del reporte", context["responsible_breakdown"]),
     ]:
         summary.append([])
@@ -2146,14 +2146,14 @@ def build_excel_export(context: dict[str, object]) -> bytes:
         data_sheet.column_dimensions[col_cells[0].column_letter].width = width
 
     sprint_column = pick_column(columns, ["Sprint despliegue"])
-    priority_column = pick_column(columns, ["Prioridad", "Prioridad"])
+    priority_column = pick_column(columns, ["prioridad DB", "prioridad db"])
     country_column = pick_column(columns, ["PAIS", "País", "pais", "country"])
     detail_country_column = pick_column(columns, ["Detalle paises"])
     sprint_report_column = pick_column(columns, ["sprint Reportes"])
     card_devops_column = pick_column(columns, ["tarjeta Devops"])
 
     if sprint_column and priority_column:
-        priority_sheet = workbook.create_sheet("Análisis Prioridad")
+        priority_sheet = workbook.create_sheet("Análisis Prioridad DB")
 
         sprints = sorted(set(str(row.get(sprint_column, "")).strip() for row in rows if row.get(sprint_column)))
 
@@ -2176,7 +2176,7 @@ def build_excel_export(context: dict[str, object]) -> bytes:
 
             priority_sheet.append([])
             priority_sheet.append(["Detalle de Registros"])
-            priority_sheet.append(["País", "Novedad", "Sprint Reportes", "Tarjeta Devops", "Sprint Despliegue", "Prioridad"])
+            priority_sheet.append(["País", "Novedad", "Sprint Reportes", "Tarjeta Devops", "Sprint Despliegue", "Prioridad DB"])
 
             novedad_column = pick_column(columns, ["NOVEDAD", "Novedad"])
             for row in sprint_rows:
@@ -2307,7 +2307,7 @@ def build_pdf_export(context: dict[str, object]) -> bytes:
 
     add_section("Defecto por pais", context["country_breakdown"])
     add_section("Despliegue por sprint", context["sprint_deployment_breakdown"])
-    add_section("Prioridad", context["priority_db_breakdown"])
+    add_section("Prioridad DB", context["priority_db_breakdown"])
     add_section("Responsable del reporte", context["responsible_breakdown"])
 
     lines.append("")
