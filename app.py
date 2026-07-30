@@ -839,6 +839,10 @@ HTML_PAGE = """<!doctype html>
         <button class="option-btn secondary" id="exportPdfBtn" type="button">Exportar PDF</button>
       </div>
       <div class="status-box" id="optionStatus">Sincronizado con el archivo actual.</div>
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; text-align: center; font-size: 11px; color: #999;">
+        <strong>Tablero Gerencial v1.0.0</strong><br/>
+        <span>© 2026 - Todos los derechos reservados</span>
+      </div>
     </aside>
 
     <main class="main">
