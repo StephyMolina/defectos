@@ -1051,6 +1051,28 @@ HTML_PAGE = """<!doctype html>
       'legal y mandatorio': '#e4002b',
       'auditoria': '#b16a00',
       'soporte': '#2e7d32',
+      'regulatorio': '#2e7d32',
+      'operacional': '#1976d2',
+      'mejora': '#7b1fa2',
+    };
+
+    const STATUS_COLORS = {
+      'produccion': '#2e7d32',
+      'production': '#2e7d32',
+      'escalado a desarrollo': '#1976d2',
+      'escalado a despliegue': '#f57c00',
+      'qa': '#ff9800',
+      'done': '#2e7d32',
+      'solventado': '#2e7d32',
+      'cerrado': '#2e7d32',
+      'cerrada': '#2e7d32',
+      'completado': '#2e7d32',
+      'finalizado': '#2e7d32',
+      'closed': '#2e7d32',
+      'resuelto': '#2e7d32',
+      'requerimiento': '#9c27b0',
+      'pendiente': '#f44336',
+      'en progreso': '#2196f3',
     };
 
     function apiUrl(path, params = {}) {
@@ -1325,16 +1347,21 @@ HTML_PAGE = """<!doctype html>
 
         const tableRows = items.map((item) => {
           const itemRows = prioRows.filter((row) => String(row[statusColumn] ?? '').trim() === String(item.label).trim());
-          return itemRows.map((row) => `
-            <tr>
-              <td>${escapeHtml(String(row['PAIS'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['NOVEDAD'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['sprint Reportes'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['tarjeta Devops'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['Sprint despliegue'] ?? ''))}</td>
-              <td>${escapeHtml(String(row[statusColumn] ?? ''))}</td>
-            </tr>
-          `).join('');
+          return itemRows.map((row) => {
+            const statusValue = String(row[statusColumn] ?? '');
+            const statusColor = STATUS_COLORS[statusValue.toLowerCase()] || '#9e9e9e';
+            const textColor = ['#2e7d32', '#1976d2', '#7b1fa2'].includes(statusColor) ? '#fff' : '#000';
+            return `
+              <tr>
+                <td>${escapeHtml(String(row['PAIS'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['NOVEDAD'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['sprint Reportes'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['tarjeta Devops'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['Sprint despliegue'] ?? ''))}</td>
+                <td style="background-color: ${statusColor}; color: ${textColor}; font-weight: 600; padding: 8px; border-radius: 4px;">${escapeHtml(statusValue)}</td>
+              </tr>
+            `;
+          }).join('');
         }).join('');
 
         const tableHtml = prioRows && prioRows.length > 0 ? `
