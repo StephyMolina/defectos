@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urlparse
 
 from openpyxl import Workbook, load_workbook
 
-EXCEL_PATH = Path(r"C:\laragon\MOLINA\BUGS Reportados SIR 2024.xlsx")
+EXCEL_PATH = Path(r"C:\laragon\www\tablero defectos\BUGS Reportados SIR 2024.xlsx")
 HOST = "127.0.0.1"
 PORT = 8000
 
@@ -831,6 +831,7 @@ HTML_PAGE = """<!doctype html>
           <div id="pastelesSubmenu" class="submenu hidden">
             <button class="option-btn secondary submenu-item" id="navPastelesSprint" type="button">Pasteles Sprint</button>
             <button class="option-btn secondary submenu-item" id="navPastelesPrority" type="button">Pasteles Prioridad DB</button>
+            <button class="option-btn secondary submenu-item" id="navPastelesEstadoPrority" type="button">Estado y Prioridad DB</button>
           </div>
         </div>
 
@@ -946,6 +947,18 @@ HTML_PAGE = """<!doctype html>
           </div>
         </div>
         <div class="pie-grid" id="prioBySprintGrid"></div>
+      </section>
+
+      <section class="panel section hidden-section" id="pasteleEstadoProitySection">
+        <div class="section-head">
+          <h2 class="section-title">Análisis: Estado por Prioridad DB</h2>
+          <p class="section-subtitle" id="estadoProityHint">Estado agrupado por Prioridad DB para cada sprint seleccionado.</p>
+          <div style="margin-top: 12px; display: flex; gap: 8px;">
+            <button class="option-btn" id="saveEstadoProityPdfBtn" type="button" style="font-size: 12px; padding: 8px 12px;">Descargar PDF</button>
+            <button class="option-btn secondary" id="saveEstadoProityExcelBtn" type="button" style="font-size: 12px; padding: 8px 12px;">Descargar Excel</button>
+          </div>
+        </div>
+        <div class="pie-grid" id="estadoProityGrid"></div>
       </section>
     </main>
   </div>
@@ -1255,6 +1268,103 @@ HTML_PAGE = """<!doctype html>
             <div>
               <h3>Sprint ${sprint}</h3>
               <p>${sprintRows.length} registros</p>
+            </div>
+            <div class="pie-figure" style="background:${buildPieGradient(items)};">
+              <div class="pie-center"><strong>${items[0]?.share || 0}%</strong><span>${items[0]?.label || 'Sin datos'}</span></div>
+            </div>
+            <div class="pie-legend">
+              ${items.map((item) => `
+                <div class="legend-item">
+                  <span class="legend-swatch" style="background:${item.color};"></span>
+                  <span>${escapeHtml(item.label)}</span>
+                  <span class="legend-meta">${item.count} · ${item.share}%</span>
+                </div>
+              `).join('')}
+            </div>
+            ${tableHtml}
+          </section>
+        `;
+      }).join('');
+    }
+
+    function renderEstadoByPrority(payload, sprintColumn, priorityColumn, statusColumn) {
+      const grid = document.getElementById('estadoProityGrid');
+      const hint = document.getElementById('estadoProityHint');
+      if (!grid) return;
+
+      const selected = sprintColumn && Array.isArray(state.activeFilters[sprintColumn])
+        ? state.activeFilters[sprintColumn].filter((value) => value && value !== 'all')
+        : [];
+
+      if (!priorityColumn || !statusColumn) {
+        grid.innerHTML = '<div class="empty">Faltan campos requeridos en la hoja.</div>';
+        if (hint) hint.textContent = 'Sin campos necesarios en esta hoja.';
+        return;
+      }
+      if (!selected.length) {
+        grid.innerHTML = '';
+        if (hint) hint.textContent = 'Marca uno o más sprints en el filtro para ver el estado por prioridad DB.';
+        return;
+      }
+
+      const filteredRows = payload.rows.filter((row) => selected.includes(String(row[sprintColumn] ?? '').trim()));
+
+      if (!filteredRows.length) {
+        grid.innerHTML = '<div class="empty">No hay datos para los sprints seleccionados.</div>';
+        if (hint) hint.textContent = 'No hay registros en los sprints seleccionados.';
+        return;
+      }
+
+      const priorities = [...new Set(filteredRows.map((row) => String(row[priorityColumn] ?? '').trim()))].filter(Boolean);
+
+      if (hint) hint.textContent = `Analizando ${selected.length} sprint(s): ${selected.join(', ')}`;
+
+      grid.innerHTML = priorities.map((priority) => {
+        const prioRows = filteredRows.filter((row) => String(row[priorityColumn] ?? '').trim() === priority);
+        const items = countPieData(prioRows, statusColumn);
+
+        const tableRows = items.map((item) => {
+          const itemRows = prioRows.filter((row) => String(row[statusColumn] ?? '').trim() === String(item.label).trim());
+          return itemRows.map((row) => `
+            <tr>
+              <td>${escapeHtml(String(row['PAIS'] ?? ''))}</td>
+              <td>${escapeHtml(String(row['NOVEDAD'] ?? ''))}</td>
+              <td>${escapeHtml(String(row['sprint Reportes'] ?? ''))}</td>
+              <td>${escapeHtml(String(row['tarjeta Devops'] ?? ''))}</td>
+              <td>${escapeHtml(String(row['Sprint despliegue'] ?? ''))}</td>
+              <td>${escapeHtml(String(row[statusColumn] ?? ''))}</td>
+            </tr>
+          `).join('');
+        }).join('');
+
+        const tableHtml = prioRows && prioRows.length > 0 ? `
+          <div style="margin-top: 16px;">
+            <h4 style="margin: 0 0 8px; font-size: 13px; color: #666;">Detalle de registros (${prioRows.length} registros)</h4>
+            <div style="border: 1px solid #ddd; border-radius: 8px; overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead style="background: #f5f5f5;">
+                  <tr>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">País</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Novedad</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Sprint Reportes</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Tarjeta Devops</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Sprint Despliegue</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableRows}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ` : '';
+
+        return `
+          <section class="pie-card">
+            <div>
+              <h3>${escapeHtml(priority)}</h3>
+              <p>${prioRows.length} registros</p>
             </div>
             <div class="pie-figure" style="background:${buildPieGradient(items)};">
               <div class="pie-center"><strong>${items[0]?.share || 0}%</strong><span>${items[0]?.label || 'Sin datos'}</span></div>
@@ -1733,13 +1843,40 @@ HTML_PAGE = """<!doctype html>
         const pageTablero = document.getElementById('pageTableroGeneral');
         const pagePastelesSprint = document.getElementById('pasteleSprintSection');
         const pagePastelesProity = document.getElementById('pasteleProitySection');
+        const pageEstadoProity = document.getElementById('pasteleEstadoProitySection');
 
         if (pageTablero) pageTablero.classList.add('hidden-section');
         if (pagePastelesSprint) pagePastelesSprint.classList.add('hidden-section');
         if (pagePastelesProity) pagePastelesProity.classList.remove('hidden-section');
+        if (pageEstadoProity) pageEstadoProity.classList.add('hidden-section');
 
         if (pagePastelesProity) {
           pagePastelesProity.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
+    const navPastelesEstadoProity = document.getElementById('navPastelesEstadoPrority');
+    if (navPastelesEstadoProity) {
+      navPastelesEstadoProity.addEventListener('click', () => {
+        const pageTablero = document.getElementById('pageTableroGeneral');
+        const pagePastelesSprint = document.getElementById('pasteleSprintSection');
+        const pagePastelesProity = document.getElementById('pasteleProitySection');
+        const pageEstadoProity = document.getElementById('pasteleEstadoProitySection');
+
+        if (pageTablero) pageTablero.classList.add('hidden-section');
+        if (pagePastelesSprint) pagePastelesSprint.classList.add('hidden-section');
+        if (pagePastelesProity) pagePastelesProity.classList.add('hidden-section');
+        if (pageEstadoProity) pageEstadoProity.classList.remove('hidden-section');
+
+        if (pageEstadoProity) {
+          pageEstadoProity.scrollIntoView({ behavior: 'smooth' });
+          if (state.latestPayload) {
+            const sprintColumn = getColumnName(state.latestPayload.columns, ['Sprint despliegue']);
+            const priorityColumn = getColumnName(state.latestPayload.columns, ['prioridad DB', 'prioridad db']);
+            const statusColumn = getColumnName(state.latestPayload.columns, ['Status', 'Estado', 'estado', 'estado de reporte']);
+            renderEstadoByPrority(state.latestPayload, sprintColumn, priorityColumn, statusColumn);
+          }
         }
       });
     }
@@ -1756,6 +1893,16 @@ HTML_PAGE = """<!doctype html>
     const savePrioDbExcelBtn = document.getElementById('savePrioDbExcelBtn');
     if (savePrioDbExcelBtn) {
       savePrioDbExcelBtn.addEventListener('click', () => triggerExport('excel'));
+    }
+
+    const saveEstadoProityPdfBtn = document.getElementById('saveEstadoProityPdfBtn');
+    if (saveEstadoProityPdfBtn) {
+      saveEstadoProityPdfBtn.addEventListener('click', () => window.print());
+    }
+
+    const saveEstadoProityExcelBtn = document.getElementById('saveEstadoProityExcelBtn');
+    if (saveEstadoProityExcelBtn) {
+      saveEstadoProityExcelBtn.addEventListener('click', () => triggerExport('excel'));
     }
 
     const refreshExcelBtnMain = document.getElementById('refreshExcelBtnMain');
