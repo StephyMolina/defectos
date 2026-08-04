@@ -533,12 +533,14 @@ HTML_PAGE = """<!doctype html>
     }
 
     tbody td {
-      padding: 10px;
+      text-align: center;
+      padding: 12px;
       border-bottom: 1px solid #ede6da;
-      vertical-align: top;
+      vertical-align: middle;
       white-space: normal;
       word-break: break-word;
       overflow-wrap: anywhere;
+      line-height: 1.5;
     }
 
     tbody tr:nth-child(even) td {
@@ -813,6 +815,113 @@ HTML_PAGE = """<!doctype html>
         max-height: none;
       }
     }
+
+    .pie-expand-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border: 1px solid #d4ccbe;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--kfc-red);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 200ms ease;
+      z-index: 10;
+    }
+
+    .pie-expand-btn:hover {
+      background: #fff5f7;
+      border-color: var(--kfc-red);
+      transform: scale(1.1);
+    }
+
+    .pie-card {
+      position: relative;
+    }
+
+    .pie-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(6px);
+    }
+
+    .pie-modal-overlay.open {
+      display: flex;
+    }
+
+    .pie-modal-content {
+      width: min(800px, 100%);
+      max-height: 85vh;
+      overflow: auto;
+      background: #fff;
+      border: 1px solid #d8cec0;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 26px 90px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .pie-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid #c7bcae;
+      background: #fff;
+      color: #111;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 200ms ease;
+    }
+
+    .pie-modal-close:hover {
+      background: #f5f5f5;
+      border-color: #111;
+    }
+
+    .pie-modal-figure {
+      width: 100%;
+      max-width: 500px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .pie-modal-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+      color: var(--kfc-black);
+    }
+
+    .pie-modal-subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pie-modal-legend {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -906,30 +1015,35 @@ HTML_PAGE = """<!doctype html>
         </div>
         <div class="pie-grid" id="pasteleSprintGrid">
           <section class="pie-card">
+            <button class="pie-expand-btn" data-expand-pie="pieSprint1" title="Expandir gráfico">⛶</button>
             <div><h3>Distribución por estado</h3><p>Participación por estado / status en los registros visibles.</p></div>
             <div class="pie-figure" id="pieSprint1"><div class="pie-center"><strong id="pieSprint1Value">0%</strong><span id="pieSprint1Label">Sin datos</span></div></div>
             <div class="pie-legend" id="pieSprint1Legend"></div>
           </section>
 
           <section class="pie-card">
+            <button class="pie-expand-btn" data-expand-pie="pieSprint2" title="Expandir gráfico">⛶</button>
             <div><h3>Porcentaje de defecto por país</h3><p>Participación por país en los registros visibles.</p></div>
             <div class="pie-figure" id="pieSprint2"><div class="pie-center"><strong id="pieSprint2Value">0%</strong><span id="pieSprint2Label">Sin datos</span></div></div>
             <div class="pie-legend" id="pieSprint2Legend"></div>
           </section>
 
           <section class="pie-card">
+            <button class="pie-expand-btn" data-expand-pie="pieSprint3" title="Expandir gráfico">⛶</button>
             <div><h3>Despliegue por sprint</h3><p>Tomado del campo Sprint despliegue.</p></div>
             <div class="pie-figure" id="pieSprint3"><div class="pie-center"><strong id="pieSprint3Value">0%</strong><span id="pieSprint3Label">Sin datos</span></div></div>
             <div class="pie-legend" id="pieSprint3Legend"></div>
           </section>
 
           <section class="pie-card">
+            <button class="pie-expand-btn" data-expand-pie="pieSprint4" title="Expandir gráfico">⛶</button>
             <div><h3>Prioridad DB</h3><p>Distribución por prioridad DB de la hoja actual.</p></div>
             <div class="pie-figure" id="pieSprint4"><div class="pie-center"><strong id="pieSprint4Value">0%</strong><span id="pieSprint4Label">Sin datos</span></div></div>
             <div class="pie-legend" id="pieSprint4Legend"></div>
           </section>
 
           <section class="pie-card">
+            <button class="pie-expand-btn" data-expand-pie="pieSprint5" title="Expandir gráfico">⛶</button>
             <div><h3>Responsable del reporte</h3><p>Participación por responsable de reporte.</p></div>
             <div class="pie-figure" id="pieSprint5"><div class="pie-center"><strong id="pieSprint5Value">0%</strong><span id="pieSprint5Label">Sin datos</span></div></div>
             <div class="pie-legend" id="pieSprint5Legend"></div>
@@ -963,6 +1077,16 @@ HTML_PAGE = """<!doctype html>
     </main>
   </div>
 
+  <div class="pie-modal-overlay" id="pieExpandModal" aria-hidden="true">
+    <div class="pie-modal-content" role="dialog" aria-modal="true" aria-labelledby="pieExpandTitle">
+      <button class="pie-modal-close" id="closePieExpandBtn" aria-label="Cerrar gráfico expandido">×</button>
+      <h2 class="pie-modal-title" id="pieExpandTitle">Gráfico expandido</h2>
+      <p class="pie-modal-subtitle" id="pieExpandSubtitle">Vista detallada del gráfico</p>
+      <div class="pie-modal-figure" id="pieExpandFigure"></div>
+      <div class="pie-modal-legend" id="pieExpandLegend"></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="insightModal" aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="insightTitle">
       <div class="modal-head">
@@ -979,6 +1103,7 @@ HTML_PAGE = """<!doctype html>
 
       <div class="pie-grid">
         <section class="pie-card">
+          <button class="pie-expand-btn" data-expand-pie="pieStatus" title="Expandir gráfico">⛶</button>
           <div>
             <h3>Distribución por estado</h3>
             <p>Participación por estado / status en los registros visibles.</p>
@@ -988,6 +1113,7 @@ HTML_PAGE = """<!doctype html>
         </section>
 
         <section class="pie-card">
+          <button class="pie-expand-btn" data-expand-pie="pieCountry" title="Expandir gráfico">⛶</button>
           <div>
             <h3>Porcentaje de defecto por país</h3>
             <p>Participación por país en los registros visibles.</p>
@@ -997,6 +1123,7 @@ HTML_PAGE = """<!doctype html>
         </section>
 
         <section class="pie-card">
+          <button class="pie-expand-btn" data-expand-pie="pieDeployment" title="Expandir gráfico">⛶</button>
           <div>
             <h3>Despliegue por sprint</h3>
             <p>Tomado del campo Sprint despliegue.</p>
@@ -1006,6 +1133,7 @@ HTML_PAGE = """<!doctype html>
         </section>
 
         <section class="pie-card">
+          <button class="pie-expand-btn" data-expand-pie="piePriorityDb" title="Expandir gráfico">⛶</button>
           <div>
             <h3>Prioridad DB</h3>
             <p>Distribución por prioridad DB de la hoja actual.</p>
@@ -1015,6 +1143,7 @@ HTML_PAGE = """<!doctype html>
         </section>
 
         <section class="pie-card">
+          <button class="pie-expand-btn" data-expand-pie="pieResponsible" title="Expandir gráfico">⛶</button>
           <div>
             <h3>Responsable del reporte</h3>
             <p>Participación por responsable de reporte.</p>
@@ -1048,7 +1177,7 @@ HTML_PAGE = """<!doctype html>
 
     const PIE_COLORS = ['#e4002b', '#111111', '#ff8aa2', '#d0b28f', '#7f1d1d', '#f3a6b5', '#6b7280'];
     const PRIORITY_COLORS = {
-      'legal y mandatorio': '#e4002b',
+      'legal y mandatorio': '#d64545',
       'auditoria': '#b16a00',
       'soporte': '#2e7d32',
       'regulatorio': '#2e7d32',
@@ -1484,6 +1613,49 @@ HTML_PAGE = """<!doctype html>
       modal.setAttribute('aria-hidden', 'true');
     }
 
+    function openPieExpand(pieId) {
+      const pieFigure = document.getElementById(pieId);
+      if (!pieFigure) return;
+
+      const pieLegendId = pieId + 'Legend';
+      const pieLegend = document.getElementById(pieLegendId);
+
+      const pieTitle = pieFigure.closest('.pie-card')?.querySelector('h3')?.textContent || 'Gráfico expandido';
+      const pieSubtitle = pieFigure.closest('.pie-card')?.querySelector('p')?.textContent || '';
+
+      const expandFigure = document.getElementById('pieExpandFigure');
+      const expandLegend = document.getElementById('pieExpandLegend');
+      const expandTitle = document.getElementById('pieExpandTitle');
+      const expandSubtitle = document.getElementById('pieExpandSubtitle');
+
+      if (expandTitle) expandTitle.textContent = pieTitle;
+      if (expandSubtitle) expandSubtitle.textContent = pieSubtitle;
+
+      if (expandFigure) {
+        expandFigure.style.background = pieFigure.style.background;
+        const centerHtml = pieFigure.querySelector('.pie-center')?.innerHTML || '';
+        expandFigure.innerHTML = `<div class="pie-center">${centerHtml}</div>`;
+      }
+
+      if (expandLegend && pieLegend) {
+        expandLegend.innerHTML = pieLegend.innerHTML;
+      }
+
+      const modal = document.getElementById('pieExpandModal');
+      if (modal) {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function closePieExpand() {
+      const modal = document.getElementById('pieExpandModal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
     function triggerExport(format) {
       window.location.href = apiUrl(`/export/${format}`, buildCurrentParams());
     }
@@ -1788,6 +1960,31 @@ HTML_PAGE = """<!doctype html>
     const closeInsBtn = document.getElementById('closeInsightsBtn');
     if (closeInsBtn) closeInsBtn.addEventListener('click', closeInsights);
 
+    const closePieExpandBtn = document.getElementById('closePieExpandBtn');
+    if (closePieExpandBtn) closePieExpandBtn.addEventListener('click', closePieExpand);
+
+    document.querySelectorAll('.pie-expand-btn').forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const pieId = btn.getAttribute('data-expand-pie');
+        if (pieId) openPieExpand(pieId);
+      });
+    });
+
+    const pieExpandModal = document.getElementById('pieExpandModal');
+    if (pieExpandModal) {
+      pieExpandModal.addEventListener('click', (event) => {
+        if (event.target.id === 'pieExpandModal') closePieExpand();
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeInsights();
+        closePieExpand();
+      }
+    });
+
     const savePdfBtn = document.getElementById('savePiesPdfBtn');
     if (savePdfBtn) savePdfBtn.addEventListener('click', () => window.print());
 
@@ -1947,10 +2144,6 @@ HTML_PAGE = """<!doctype html>
 
     document.getElementById('insightModal').addEventListener('click', (event) => {
       if (event.target.id === 'insightModal') closeInsights();
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeInsights();
     });
 
     loadData(true);
