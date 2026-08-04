@@ -1248,18 +1248,25 @@ HTML_PAGE = """<!doctype html>
         const sprintRows = payload.rows.filter((row) => String(row[sprintColumn] ?? '').trim() === String(sprint).trim());
         const items = countPieData(sprintRows, priorityColumn);
 
+        const statusColumn = getColumnName(payload.columns, ['Status', 'Estado', 'estado', 'estado de reporte']);
         const tableRows = items.map((item) => {
           const itemRows = sprintRows.filter((row) => String(row[priorityColumn] ?? '').trim() === String(item.label).trim());
-          return itemRows.map((row) => `
-            <tr>
-              <td>${escapeHtml(String(row['PAIS'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['NOVEDAD'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['sprint Reportes'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['tarjeta Devops'] ?? ''))}</td>
-              <td>${escapeHtml(String(row['Sprint despliegue'] ?? ''))}</td>
-              <td style="background-color: ${PRIORITY_COLORS[String(row[priorityColumn] ?? '').toLowerCase()] || '#f0f0f0'}; color: #fff; font-weight: 600; text-align: center;">${escapeHtml(String(row[priorityColumn] ?? ''))}</td>
-            </tr>
-          `).join('');
+          return itemRows.map((row) => {
+            const statusValue = String(row[statusColumn] ?? '');
+            const statusColor = STATUS_COLORS[statusValue.toLowerCase()] || '#9e9e9e';
+            const statusTextColor = ['#2e7d32', '#1976d2', '#7b1fa2'].includes(statusColor) ? '#fff' : '#000';
+            return `
+              <tr>
+                <td>${escapeHtml(String(row['PAIS'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['NOVEDAD'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['sprint Reportes'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['tarjeta Devops'] ?? ''))}</td>
+                <td>${escapeHtml(String(row['Sprint despliegue'] ?? ''))}</td>
+                <td style="background-color: ${statusColor}; color: ${statusTextColor}; font-weight: 600; padding: 8px; border-radius: 4px;">${escapeHtml(statusValue)}</td>
+                <td style="background-color: ${PRIORITY_COLORS[String(row[priorityColumn] ?? '').toLowerCase()] || '#f0f0f0'}; color: #fff; font-weight: 600; text-align: center;">${escapeHtml(String(row[priorityColumn] ?? ''))}</td>
+              </tr>
+            `;
+          }).join('');
         }).join('');
 
         const tableHtml = sprintRows && sprintRows.length > 0 ? `
@@ -1274,6 +1281,7 @@ HTML_PAGE = """<!doctype html>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Sprint Reportes</th>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Tarjeta Devops</th>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 600;">Sprint Despliegue</th>
+                    <th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd; font-weight: 600;">Status</th>
                     <th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd; font-weight: 600;">Prioridad DB</th>
                   </tr>
                 </thead>
