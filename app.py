@@ -11,12 +11,16 @@ from urllib.parse import parse_qs, urlparse
 
 from openpyxl import Workbook, load_workbook
 
-EXCEL_PATH = Path(r"C:\laragon\www\tablero defectos\BUGS Reportados SIR 2024.xlsx")
+EXCEL_PATH = Path(__file__).resolve().parent / "BUGS Reportados SIR 2024.xlsx"
 HOST = "127.0.0.1"
 PORT = 8000
 
 CANDIDATE_FILTERS = [
     "anio",
+  "sprint Reportes",
+  "Sprint levantado",
+  "sprint",
+  "Sprint Solución",
     "Sprint despliegue",
     "PAIS",
     "País",
